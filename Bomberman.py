@@ -59,7 +59,7 @@ def draw_map(LEVEL_MAP):
                 pg.draw.rect(surface, "green", (j*CELL_SIZE, i*CELL_SIZE, CELL_SIZE, CELL_SIZE))
             elif cell_type == 3:
                 pg.draw.rect(surface, "black", (j*CELL_SIZE, i*CELL_SIZE, CELL_SIZE, CELL_SIZE))
- 
+
     return surface
 
 def update_time(tick, new_tick):
