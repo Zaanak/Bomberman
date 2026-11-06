@@ -118,7 +118,11 @@ class Bomb(Entity):
 
             if ask_to_burn != None:
                 ask_to_burn(i, j)
-                ask_to_burn(i+1, j+1)
+                ask_to_burn(i - 1, j) 
+                ask_to_burn(i + 1, j) 
+                ask_to_burn(i, j - 1) 
+                ask_to_burn(i, j + 1) 
+
 
 class Game:
     def process(self, events, tickdelta):
@@ -152,13 +156,17 @@ class Game:
                 self.bomb = None
 
     def burn_tile(self, i, j):
-        position = LEVEL_MAP[i][j]
+        cell_type = LEVEL_MAP[i][j]
 
+        player_j = game.player.x // CELL_SIZE
+        player_i = game.player.y // CELL_SIZE
 
-        if position and position == 2:
-            position == -1
+        if cell_type == 2:
+            LEVEL_MAP[i][j] = -1
+        if player_j == j and player_i == i:
+            self.finished = True
 
-        print("burning tile", i, j)
+        print("burning tile", i, j, "|", player_j, player_i)
 
 
     def render(self):
