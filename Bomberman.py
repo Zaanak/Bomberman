@@ -176,7 +176,20 @@ class Game:
         pg.draw.circle(surface, "red", (self.player.x, self.player.y), HALF_CELL_SIZE)
         if self.bomb:
                 pg.draw.circle(surface, "black", (self.bomb.x, self.bomb.y), HALF_CELL_SIZE)
-                pg.draw.circle(surface, "white", (self.bomb.x, self.bomb.y), HALF_CELL_SIZE, width=3)
+
+                arc_rect = (
+                    self.bomb.x - HALF_CELL_SIZE,
+                    self.bomb.y - HALF_CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE,
+                )
+
+                progress = max(0.0, self.bomb.delay / 2000.0)
+                stop_angle = progress * 2 * math.pi
+
+                if stop_angle > 0:
+                    pg.draw.arc(surface, "white", arc_rect, 0, stop_angle, width=3)
+                
                 print(self.bomb.x, self.bomb.y)
         return surface
 
