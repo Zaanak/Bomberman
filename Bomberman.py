@@ -1,6 +1,7 @@
 import pygame as pg
 from enum import Enum
 import random
+import math
 
 pg.init()
 
@@ -170,10 +171,12 @@ class Game:
 
 
     def render(self):
+
         surface = draw_map(LEVEL_MAP)
         pg.draw.circle(surface, "red", (self.player.x, self.player.y), HALF_CELL_SIZE)
         if self.bomb:
                 pg.draw.circle(surface, "black", (self.bomb.x, self.bomb.y), HALF_CELL_SIZE)
+                pg.draw.circle(surface, "white", (self.bomb.x, self.bomb.y), HALF_CELL_SIZE, width=3)
                 print(self.bomb.x, self.bomb.y)
         return surface
 
