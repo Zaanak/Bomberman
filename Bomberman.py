@@ -107,7 +107,6 @@ class Bomb(Entity):
     def __init__(self, x, y, delay=2000, range=1):
         super().__init__("Bomb", x, y)
         self.delay = delay
-        self.range = range
 
     def update(self, tickdelta, ask_to_burn=None):
         self.delay -= tickdelta
@@ -124,7 +123,23 @@ class Bomb(Entity):
                 ask_to_burn(i, j - 1) 
                 ask_to_burn(i, j + 1) 
 
+    def render(self, surface):
+        pg.draw.circle(surface, "black", (self.x, self.y), HALF_CELL_SIZE)
 
+        arc_rect = (
+            self.x - HALF_CELL_SIZE,
+            self.y - HALF_CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+                    )
+
+        progress = max(0.0, self.delay / 2000.0)
+        stop_angle = progress * 2 * math.pi
+
+        if stop_angle > 0:
+            pg.draw.arc(surface, "white", arc_rect, 0, stop_angle, width=3)
+            print(self.x, self.y)
+    
 class Game:
     def process(self, events, tickdelta):
         if self.finished:
@@ -171,26 +186,11 @@ class Game:
 
 
     def render(self):
-
         surface = draw_map(LEVEL_MAP)
         pg.draw.circle(surface, "red", (self.player.x, self.player.y), HALF_CELL_SIZE)
-        if self.bomb:
-                pg.draw.circle(surface, "black", (self.bomb.x, self.bomb.y), HALF_CELL_SIZE)
 
-                arc_rect = (
-                    self.bomb.x - HALF_CELL_SIZE,
-                    self.bomb.y - HALF_CELL_SIZE,
-                    CELL_SIZE,
-                    CELL_SIZE,
-                )
-
-                progress = max(0.0, self.bomb.delay / 2000.0)
-                stop_angle = progress * 2 * math.pi
-
-                if stop_angle > 0:
-                    pg.draw.arc(surface, "white", arc_rect, 0, stop_angle, width=3)
-                
-                print(self.bomb.x, self.bomb.y)
+        if self.bomb is not None:
+            self.bomb.render(surface)
         return surface
 
 
