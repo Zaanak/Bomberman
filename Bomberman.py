@@ -20,7 +20,7 @@ LEVEL_MAP = [
     [+1,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+1,],
     [+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,],
     [+1,+9,+9,+9,+9,+9,+9,+9,+9,+2,+9,+9,+9,+9,+1,],
-    [+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+3,+1,],
+    [+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,+9,+1,],
     [+1,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+9,+1,],
     [+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,+1,],
 ]
@@ -207,7 +207,10 @@ class Game:
         player_i = game.player.y // CELL_SIZE
 
         if cell_type == 2:
-            LEVEL_MAP[i][j] = -1 # Уничтожаем разрушаемый блок
+            if i == self.exit_i and j == self.exit_j:
+                LEVEL_MAP[i][j] = 3
+            else:
+                LEVEL_MAP[i][j] = -1
         if player_j == j and player_i == i:
             self.finished = True # Игрок погиб от взрыва
 
@@ -232,6 +235,7 @@ class Game:
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
 
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
+        destructive_list = []
         for i in range(11):
             for j in range(15):
                 cell_type = LEVEL_MAP[i][j]
@@ -239,8 +243,16 @@ class Game:
                 if cell_type == 9:
                     if random.random() > 0.9:
                         LEVEL_MAP[i][j] = 2
+                        destructive_list.append((i,j))
                     else:
                         LEVEL_MAP[i][j] = -1
+        if destructive_list:
+            exit_coords = random.choice(destructive_list)
+            self.exit_i, self.exit_j = exit_coords
+        else:
+            self.exit_i, self.exit_j = -1, -1
+
+        print(self.exit_i, self.exit_j)
 
 # --- ЗАПУСК ИГРЫ ---
 screen = pg.display.set_mode((15*CELL_SIZE, 11*CELL_SIZE))
