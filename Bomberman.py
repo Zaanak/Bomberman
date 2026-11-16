@@ -207,7 +207,7 @@ class Game:
         player_i = game.player.y // CELL_SIZE
 
         if cell_type == 2:
-            if i == self.exit_i and j == self.exit_j:
+            if i == self.exit_i and j == self.exit_j: # Проверка после взрыва есть ли там блок выхода
                 LEVEL_MAP[i][j] = 3
             else:
                 LEVEL_MAP[i][j] = -1
@@ -235,7 +235,7 @@ class Game:
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
 
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
-        destructive_list = []
+        destructive_list = [] # Лист который хранит в себе все координаты разрушаеммых клеток
         for i in range(11):
             for j in range(15):
                 cell_type = LEVEL_MAP[i][j]
@@ -246,12 +246,14 @@ class Game:
                         destructive_list.append((i,j))
                     else:
                         LEVEL_MAP[i][j] = -1
+
+        # Участок отвечающий за создание координат блока выхода                
         if destructive_list:
             exit_coords = random.choice(destructive_list)
             self.exit_i, self.exit_j = exit_coords
         else:
-            self.exit_i, self.exit_j = -1, -1
-
+            self.exit_i, self.exit_j = 9, 13
+            LEVEL_MAP[self.exit_i][self.exit_j] = 3
         print(self.exit_i, self.exit_j)
 
 # --- ЗАПУСК ИГРЫ ---
