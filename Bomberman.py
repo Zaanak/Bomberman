@@ -182,8 +182,8 @@ class Game:
 
         # Поставить бомбу по нажатию клавиши 'E' (если её еще нет на поле)
         if keys[pg.K_e]:
-            self.bomb = Bomb(clip_mid(self.player.x), clip_mid(self.player.y))
-
+            new_bomb = Bomb(clip_mid(self.player.x), clip_mid(self.player.y))
+            self.bomb.append(new_bomb)
         # Проверка, наступил ли игрок на финиш (черная клетка = 3)
         j = game.player.x // CELL_SIZE
         i = game.player.y // CELL_SIZE
@@ -193,11 +193,11 @@ class Game:
             self.finished = True
 
         # Если бомба существует — обновляем её таймер
-        if self.bomb:
-            self.bomb.update(tickdelta, self.burn_tile)
+        for bomb in self.bomb:
+            bomb.update(tickdelta, self.burn_tile)
             # Когда время вышло (delay < 0), удаляем бомбу
-            if self.bomb.delay < 0:
-                self.bomb = None
+            if bomb.delay < 0:
+                self.bomb.remove(bomb)
 
     # Логика взрыва блоков и гибели игрока
     def burn_tile(self, i, j):
@@ -224,14 +224,14 @@ class Game:
         pg.draw.circle(surface, "red", (self.player.x, self.player.y), HALF_CELL_SIZE)
 
         # 3. Если есть бомба — рисуем её поверх карты и игрока
-        if self.bomb is not None:
-            self.bomb.render(surface)
+        for bomb in self.bomb:
+            bomb.render(surface)
         return surface # Возвращаем готовый экран для отрисовки
 
 
     def __init__(self):
         self.finished = False
-        self.bomb = None # Изначально бомбы на поле нет
+        self.bomb = [] # Изначально бомбы на поле нет
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
 
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
@@ -252,6 +252,7 @@ class Game:
             exit_coords = random.choice(destructive_list)
             self.exit_i, self.exit_j = exit_coords
         else:
+            # Условие при котором если не сгенерируется ни одна клетка то выход будет в указанном месте
             self.exit_i, self.exit_j = 9, 13
             LEVEL_MAP[self.exit_i][self.exit_j] = 3
         print(self.exit_i, self.exit_j)
