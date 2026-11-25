@@ -240,7 +240,25 @@ class Game:
         self.finished = False
         self.bomb = [] # Изначально бомбы на поле нет
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
-        self.enemy = Enemy("Enemy", 24, 24)
+
+        spawn_list = []
+        for i in range(11):
+            for j in range(15):
+
+                player_j = self.player.x // CELL_SIZE
+                player_i = self.player.y // CELL_SIZE
+
+                if is_walkable(j * CELL_SIZE + HALF_CELL_SIZE, i * CELL_SIZE + HALF_CELL_SIZE) and (i,j) != (player_i, player_j):
+                    spawn_list.append((i,j))
+
+        if spawn_list:
+            random_coords = random.choice(spawn_list)
+            self.random_x, self.random_y = random_coords
+
+            spawn_j = (self.random_x * CELL_SIZE + HALF_CELL_SIZE)
+            spawn_i = (self.random_y * CELL_SIZE + HALF_CELL_SIZE)
+
+        self.enemy = Enemy("Enemy", spawn_j, spawn_i)
 
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
         destructive_list = [] # Лист который хранит в себе все координаты разрушаеммых клеток
@@ -254,7 +272,7 @@ class Game:
                         destructive_list.append((i,j))
                     else:
                         LEVEL_MAP[i][j] = -1
-
+   
         # Участок отвечающий за создание координат блока выхода                
         if destructive_list:
             exit_coords = random.choice(destructive_list)
@@ -264,6 +282,7 @@ class Game:
             self.exit_i, self.exit_j = 9, 13
             LEVEL_MAP[self.exit_i][self.exit_j] = 3
         print(self.exit_i, self.exit_j)
+
 
 # --- ЗАПУСК ИГРЫ ---
 screen = pg.display.set_mode((15*CELL_SIZE, 11*CELL_SIZE))
