@@ -160,6 +160,13 @@ class Bomb(Entity):
             pg.draw.arc(surface, "white", arc_rect, 0, stop_angle, width=3)
             print(self.x, self.y)
 
+class Enemy(Entity):
+    def move(self, direction):
+        pass
+
+    def render(self, surface):
+        pg.draw.circle(surface, "blue", (self.x, self.y), HALF_CELL_SIZE)
+
 # Главный класс игры, который управляет процессом, игроком и бомбами  
 class Game:
 
@@ -222,7 +229,7 @@ class Game:
         surface = draw_map(LEVEL_MAP)
         # 2. Рисуем игрока (красный круг)
         pg.draw.circle(surface, "red", (self.player.x, self.player.y), HALF_CELL_SIZE)
-
+        self.enemy.render(surface)
         # 3. Если есть бомба — рисуем её поверх карты и игрока
         for bomb in self.bomb:
             bomb.render(surface)
@@ -233,6 +240,7 @@ class Game:
         self.finished = False
         self.bomb = [] # Изначально бомбы на поле нет
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
+        self.enemy = Enemy("Enemy", 24, 24)
 
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
         destructive_list = [] # Лист который хранит в себе все координаты разрушаеммых клеток
