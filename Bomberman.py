@@ -162,10 +162,37 @@ class Bomb(Entity):
 
 class Enemy(Entity):
     def move(self, direction):
-        pass
+
+        old_x = self.x
+        old_y = self.y
+
+        if self.direction == Direction.UP:
+            if is_walkable(self.x, self.y - 1 - HALF_CELL_SIZE):
+                self.y -= 1
+                self.x = clip_mid(self.x)
+        elif self.direction == Direction.DOWN:
+            if is_walkable(self.x, self.y + 1 + HALF_CELL_SIZE):
+                self.y += 1
+                self.x = clip_mid(self.x)
+        elif self.direction == Direction.LEFT:
+            if is_walkable(self.x - 1 - HALF_CELL_SIZE, self.y):
+                self.x -= 1
+                self.y = clip_mid(self.y)
+        elif self.direction == Direction.RIGHT:
+            if is_walkable(self.x + 1 + HALF_CELL_SIZE, self.y):
+                self.x += 1
+                self.y = clip_mid(self.y)
+
+        if self.x == old_x and self.y == old_y:
+            self.direction = random.choice(list(Direction))
 
     def render(self, surface):
         pg.draw.circle(surface, "blue", (self.x, self.y), HALF_CELL_SIZE)
+
+    def __init__(self, name, x, y, direction=None):
+        super().__init__(name, x, y)
+        direction = random.choice(list(Direction))
+        self.direction = direction
 
 # Главный класс игры, который управляет процессом, игроком и бомбами  
 class Game:
@@ -186,6 +213,8 @@ class Game:
             self.player.move(Direction.RIGHT)
         elif keys[pg.K_a]:
             self.player.move(Direction.LEFT)
+
+        self.enemy.move(direction=None)
 
         # Поставить бомбу по нажатию клавиши 'E' (если её еще нет на поле)
         if keys[pg.K_e]:
@@ -241,25 +270,6 @@ class Game:
         self.bomb = [] # Изначально бомбы на поле нет
         self.player = Character("Bomberman", 84, 84) # Спавним игрока
 
-        spawn_list = []
-        for i in range(11):
-            for j in range(15):
-
-                player_j = self.player.x // CELL_SIZE
-                player_i = self.player.y // CELL_SIZE
-
-                if is_walkable(j * CELL_SIZE + HALF_CELL_SIZE, i * CELL_SIZE + HALF_CELL_SIZE) and (i,j) != (player_i, player_j):
-                    spawn_list.append((i,j))
-
-        if spawn_list:
-            random_coords = random.choice(spawn_list)
-            self.random_x, self.random_y = random_coords
-
-            spawn_j = (self.random_x * CELL_SIZE + HALF_CELL_SIZE)
-            spawn_i = (self.random_y * CELL_SIZE + HALF_CELL_SIZE)
-
-        self.enemy = Enemy("Enemy", spawn_j, spawn_i)
-
         # Генерация разрушаемых блоков (9 заменяем на 2 или -1)
         destructive_list = [] # Лист который хранит в себе все координаты разрушаеммых клеток
         for i in range(11):
@@ -283,6 +293,25 @@ class Game:
             LEVEL_MAP[self.exit_i][self.exit_j] = 3
         print(self.exit_i, self.exit_j)
 
+        spawn_list = []
+        for i in range(11):
+            for j in range(15):
+
+                player_j = self.player.x // CELL_SIZE
+                player_i = self.player.y // CELL_SIZE
+
+                if is_walkable(j * CELL_SIZE + HALF_CELL_SIZE, i * CELL_SIZE + HALF_CELL_SIZE) and (i,j) != (player_i, player_j):
+                    spawn_list.append((i,j))
+
+        if spawn_list:
+            random_coords = random.choice(spawn_list)
+            self.random_x, self.random_y = random_coords
+
+            spawn_j = (self.random_x * CELL_SIZE + HALF_CELL_SIZE)
+            spawn_i = (self.random_y * CELL_SIZE + HALF_CELL_SIZE)
+
+        self.enemy = Enemy("Enemy", spawn_j, spawn_i)
+
 
 # --- ЗАПУСК ИГРЫ ---
 screen = pg.display.set_mode((15*CELL_SIZE, 11*CELL_SIZE))
@@ -303,6 +332,7 @@ while running and not game.finished:
     game.process(events, tickdelta) # 1. Считаем логику и нажатия
     rendered = game.render() # 2. Рендерим всю графику в холст
     screen.blit(rendered, (0,0)) # 3. Выводим холст на реальный монитор
+
 
     pg.display.flip()
 
